@@ -14,19 +14,9 @@ areas_monitoradas = [
 "Suporte de oxigênio",
 "Estabilidade operacional"
 ]
-p_temp = 0
-p_comun = 0
-p_sis = 0
-p_sup = 0
-p_estab = 0
-
-s_temp = ""
-s_comun = ""
-s_sis = ""
-s_sup = ""
-s_estab = ""
 
 media_ciclo = 0
+
 
 def monitor_temperatura(temp):
     if temp < 18:
@@ -49,6 +39,7 @@ def monitor_temperatura(temp):
         print(f"Algum erro foi encontrado")
         return "ERRO", -1
 
+
 def monitor_comunicacao(comun):
     if comun < 30:
         print(f"Comunicação com a Base: {comun}% | Crítico | Perdendo comunicação")
@@ -58,14 +49,14 @@ def monitor_comunicacao(comun):
         print(f"Comunicação com a Base: {comun}% | Alerta | Comunicação se deteriorando")
         return "ALERTA", 1
 
-
     elif comun >= 60:
         print(f"Comunicação com a Base: {comun}% | Normal | Comunicação Estável")
-        return "Normal", 0
+        return "NORMAL", 0
 
     else:
         print(f"Algum erro foi encontrado")
         return "ERRO", -1
+
 
 def monitor_sis(sis):
     if sis < 20:
@@ -76,14 +67,14 @@ def monitor_sis(sis):
         print(f"Sistema de Energia: {sis}% | Alerta | Energia Baixa")
         return "ALERTA", 1
 
-
     elif sis >= 50:
         print(f"Sistema de Energia: {sis}% | Normal | Energia Esperada")
-        return "Normal", 0
+        return "NORMAL", 0
 
     else:
         print(f"Algum erro foi encontrado")
         return "ERRO", -1
+
 
 def monitor_suporte(sup):
     if sup < 80:
@@ -94,14 +85,14 @@ def monitor_suporte(sup):
         print(f"Suporte de Oxigênio: {sup}% | Alerta | Oxigênio abaixo do esperado")
         return "ALERTA", 1
 
-
     elif sup >= 90:
         print(f"Suporte de Oxigênio: {sup}% | Normal | Oxigenação Estável")
-        return "Normal", 0
+        return "NORMAL", 0
 
     else:
         print(f"Algum erro foi encontrado")
         return "ERRO", -1
+
 
 def monitor_estabilidade(estab):
     if estab < 40:
@@ -112,17 +103,114 @@ def monitor_estabilidade(estab):
         print(f"Estabilidade Operacional: {estab}% | Alerta | Estabilidade Deteriorada")
         return "ALERTA", 1
 
-
     elif estab >= 70:
         print(f"Estabilidade Operacional: {estab}% | Normal | Operação como esperado")
-        return "Normal", 0
+        return "NORMAL", 0
 
     else:
         print(f"Algum erro foi encontrado")
         return "ERRO", -1
 
+
+def classificar_ciclo(pontuacao):
+    if pontuacao <= 2:
+        return "MISSÃO ESTÁVEL"
+
+    elif 3 <= pontuacao <= 5:
+        return "MISSÃO EM ATENÇÃO"
+
+    else:
+        return "MISSÃO CRÍTICA"
+
+
+def gerar_recomendacao(pontuacao):
+    if pontuacao <= 2:
+        return "Manter operação normal e continuar monitoramento."
+
+    elif 3 <= pontuacao <= 5:
+        return "Monitorar sistemas em atenção e preparar plano de contingência."
+
+    else:
+        return "Ativar modo de segurança e priorizar suporte à vida, energia e comunicação."
+
+
+def analisar_tendencia(historico_risco):
+    primeiro = historico_risco[0]
+    ultimo = historico_risco[-1]
+
+    if ultimo > primeiro:
+        return "A missão apresentou tendência de piora."
+
+    elif ultimo < primeiro:
+        return "A missão apresentou tendência de recuperação."
+
+    else:
+        return "A missão permaneceu estável."
+
+
+def classificacao_final(risco_medio):
+
+    if risco_medio <= 2:
+        return "MISSÃO ESTÁVEL"
+
+    elif 2 < risco_medio <= 5:
+        return "MISSÃO EM ATENÇÃO"
+
+    else:
+        return "MISSÃO CRÍTICA"
+
+
+def gerar_conclusao(classificacao):
+
+    if classificacao == "MISSÃO ESTÁVEL":
+
+        return (
+            "A missão permaneceu estável durante toda a operação. "
+            "Os sistemas apresentaram comportamento dentro dos parâmetros esperados."
+        )
+
+    elif classificacao == "MISSÃO EM ATENÇÃO":
+
+        return (
+            "A missão apresentou instabilidade relevante durante a operação. "
+            "Apesar da tentativa de recuperação no último ciclo, ainda existem "
+            "sistemas em atenção e a equipe deve manter o plano de contingência ativo."
+        )
+
+    else:
+
+        return (
+            "A missão entrou em estado crítico durante a operação. "
+            "Múltiplos sistemas apresentaram falhas severas e ações imediatas "
+            "devem ser tomadas para preservar a integridade da missão."
+        )
+
+
 def analise_ciclo():
-    for ciclo in dados_missao:
+    p_temp_total = 0
+    p_comun_total = 0
+    p_sis_total = 0
+    p_sup_total = 0
+    p_estab_total = 0
+
+    temp_total = 0
+    comun_total = 0
+    sis_total = 0
+    sup_total = 0
+    estab_total = 0
+
+    risco_total = 0
+    maior_pontuacao = 0
+    ciclo_mais_critico = 0
+    qtd_ciclos_criticos = 0
+    historico_risco = []
+
+    total_ciclos = len(dados_missao)
+
+    for i, ciclo in enumerate(dados_missao):
+
+        print(f"\nCICLO {i + 1} ------------------------------------------------------------")
+
         temp = ciclo[0]
         comun = ciclo[1]
         sis = ciclo[2]
@@ -135,15 +223,209 @@ def analise_ciclo():
         s_sup, p_sup = monitor_suporte(sup)
         s_estab, p_estab = monitor_estabilidade(estab)
 
-        media_ciclo = (
+        pontuacao_total = (
             p_temp +
             p_comun +
             p_sis +
             p_sup +
             p_estab
         )
-        print(f"Pontuação de Risco do ciclo: {media_ciclo}\n\n")
-        print("")
+
+        classificacao = classificar_ciclo(pontuacao_total)
+        recomendacao = gerar_recomendacao(pontuacao_total)
+
+        p_temp_total += p_temp
+        p_comun_total += p_comun
+        p_sis_total += p_sis
+        p_sup_total += p_sup
+        p_estab_total += p_estab
+
+        temp_total += temp
+        comun_total += comun
+        sis_total += sis
+        sup_total += sup
+        estab_total += estab
+
+        risco_total += pontuacao_total
+
+        historico_risco.append(pontuacao_total)
+
+        if pontuacao_total > maior_pontuacao:
+            maior_pontuacao = pontuacao_total
+            ciclo_mais_critico = i + 1
+
+        if pontuacao_total >= 6:
+            qtd_ciclos_criticos += 1
+
+        print(f"Pontuação de risco do ciclo: {pontuacao_total}")
+        print(f"Classificação do ciclo: {classificacao}")
+        print(f"Recomendação: {recomendacao}")
+
+    risco_medio = round(risco_total / total_ciclos, 2)
+
+    areas = {
+        "Temperatura interna": p_temp_total,
+        "Comunicação com a base": p_comun_total,
+        "Sistema de energia": p_sis_total,
+        "Suporte de oxigênio": p_sup_total,
+        "Estabilidade operacional": p_estab_total
+    }
+
+    area_mais_afetada = max(areas, key=areas.get)
+
+    return {
+
+        "dados_reais": (
+            temp_total,
+            comun_total,
+            sis_total,
+            sup_total,
+            estab_total
+        ),
+
+        "criticidade": (
+            p_temp_total,
+            p_comun_total,
+            p_sis_total,
+            p_sup_total,
+            p_estab_total
+        ),
+
+        "estatisticas": (
+            risco_total,
+            maior_pontuacao,
+            ciclo_mais_critico,
+            qtd_ciclos_criticos,
+            area_mais_afetada,
+            risco_medio
+        ),
+
+        "total_ciclos": total_ciclos,
+
+        "historico_risco": historico_risco
+    }
 
 
-analise_ciclo()
+def calcular_medias(
+    temp_total,
+    comun_total,
+    sis_total,
+    sup_total,
+    estab_total,
+    p_temp_total,
+    p_comun_total,
+    p_sis_total,
+    p_sup_total,
+    p_estab_total,
+    total_ciclos
+):
+
+    media_temp_real = temp_total / total_ciclos
+    media_comun_real = comun_total / total_ciclos
+    media_sis_real = sis_total / total_ciclos
+    media_sup_real = sup_total / total_ciclos
+    media_estab_real = estab_total / total_ciclos
+
+    media_temp_crit = p_temp_total
+    media_comun_crit = p_comun_total
+    media_sis_crit = p_sis_total
+    media_sup_crit = p_sup_total
+    media_estab_crit = p_estab_total
+
+    return {
+
+        "temperatura_real": round(media_temp_real, 2),
+        "temperatura_crit": round(media_temp_crit, 2),
+
+        "comunicacao_real": round(media_comun_real, 2),
+        "comunicacao_crit": round(media_comun_crit, 2),
+
+        "sistema_real": round(media_sis_real, 2),
+        "sistema_crit": round(media_sis_crit, 2),
+
+        "suporte_real": round(media_sup_real, 2),
+        "suporte_crit": round(media_sup_crit, 2),
+
+        "estabilidade_real": round(media_estab_real, 2),
+        "estabilidade_crit": round(media_estab_crit, 2)
+    }
+
+
+
+
+def gerar_relatorio(
+    medias,
+    estatisticas,
+    tendencia,
+    classificacao_missao,
+    conclusao,
+    total_ciclos
+):
+
+    risco_total, maior_pontuacao, ciclo_mais_critico, qtd_ciclos_criticos, area_mais_afetada, risco_medio = estatisticas
+
+    print("\n============================================================")
+    print("RELATÓRIO FINAL DA MISSÃO")
+    print("============================================================")
+
+    print(f"Quantidade de ciclos analisados: {total_ciclos}")
+
+    print(f"\nMédia de temperatura: {medias['temperatura_real']} °C")
+    print(f"Média de comunicação: {medias['comunicacao_real']}%")
+    print(f"Média de bateria: {medias['sistema_real']}%")
+    print(f"Média de oxigênio: {medias['suporte_real']}%")
+    print(f"Média de estabilidade: {medias['estabilidade_real']}%")
+
+    print(f"\nCiclo mais crítico: Ciclo {ciclo_mais_critico}")
+    print(f"Maior pontuação de risco: {maior_pontuacao}")
+    print(f"Risco médio da missão: {risco_medio}")
+    print(f"Quantidade de ciclos críticos: {qtd_ciclos_criticos}")
+
+    print(f"\nTendência da missão:")
+    print(tendencia)
+
+    print(f"\nPontuação acumulada por área:")
+    print(f"Temperatura interna: {medias['temperatura_crit']} pontos")
+    print(f"Comunicação com a base: {medias['comunicacao_crit']} pontos")
+    print(f"Sistema de energia: {medias['sistema_crit']} pontos")
+    print(f"Suporte de oxigênio: {medias['suporte_crit']} pontos")
+    print(f"Estabilidade operacional: {medias['estabilidade_crit']} pontos")
+
+    print(f"\nÁrea mais afetada:")
+    print(area_mais_afetada)
+    print(f"\nClassificação final da missão:")
+    print(classificacao_missao)
+
+    print(f"\nConclusão:")
+    print(conclusao)
+
+
+dados = analise_ciclo()
+
+medias = calcular_medias(
+
+    *dados["dados_reais"],
+
+    *dados["criticidade"],
+
+    dados["total_ciclos"]
+)
+
+estatisticas = dados["estatisticas"]
+
+tendencia = analisar_tendencia(dados["historico_risco"])
+classificacao_missao = classificacao_final(
+    dados["estatisticas"][5]
+)
+
+conclusao = gerar_conclusao(classificacao_missao)
+
+
+gerar_relatorio(
+    medias,
+    estatisticas,
+    tendencia,
+    classificacao_missao,
+    conclusao,
+    dados["total_ciclos"]
+)
