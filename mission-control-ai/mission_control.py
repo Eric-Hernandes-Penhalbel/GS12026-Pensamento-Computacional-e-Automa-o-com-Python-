@@ -18,6 +18,19 @@ areas_monitoradas = [
 media_ciclo = 0
 
 
+def introducao_missao():
+    print("== == == == == == == == == == == == == == == == == == == == == == == == == == == == == ==")
+    print("                                 MISSION CONTROL AI  ")
+    print("== == == == == == == == == == == == == == == == == == == == == == == == == == == == == ==")
+    print("Missão: Edgar Pollo. Beta 1")
+    print("Equipe: Mend Menar Team (8: - Integrantes - )")
+    print(f"Quantidade de ciclos analisados: {len(dados_missao)}")
+
+
+
+
+
+
 def monitor_temperatura(temp):
     if temp < 18:
         print(f"Temperatura interna: {temp}ºC | Alerta | Temperatura baixa")
@@ -125,13 +138,13 @@ def classificar_ciclo(pontuacao):
 
 def gerar_recomendacao(pontuacao):
     if pontuacao <= 2:
-        return "Manter operação normal e continuar monitoramento."
+        return "Operação como esperado, continuar monitoramento."
 
     elif 3 <= pontuacao <= 5:
-        return "Monitorar sistemas em atenção e preparar plano de contingência."
+        return "Monitoramento necessário, preparar plano de contingência."
 
     else:
-        return "Ativar modo de segurança e priorizar suporte à vida, energia e comunicação."
+        return "Ativar modo de segurança do setor, priorizar suporte à vida, energia e comunicação."
 
 
 def analisar_tendencia(historico_risco):
@@ -165,24 +178,25 @@ def gerar_conclusao(classificacao):
     if classificacao == "MISSÃO ESTÁVEL":
 
         return (
-            "A missão permaneceu estável durante toda a operação. "
-            "Os sistemas apresentaram comportamento dentro dos parâmetros esperados."
+            "Durante a operação da Missão, tudo se manteve estável. \n"
+            "O comportamento dos sistemas estão todos dentro ou próximo do esperado."
         )
 
     elif classificacao == "MISSÃO EM ATENÇÃO":
 
         return (
-            "A missão apresentou instabilidade relevante durante a operação. "
-            "Apesar da tentativa de recuperação no último ciclo, ainda existem "
-            "sistemas em atenção e a equipe deve manter o plano de contingência ativo."
+            "Instabilidade na missão foi detectada durante a operação.\n "
+            "Houveram momentos estáveis dentro da missão, mas com os \n"
+            "sistemas em atenção a equipe deve manter o plano de contingência ativo."
         )
 
     else:
 
         return (
-            "A missão entrou em estado crítico durante a operação. "
-            "Múltiplos sistemas apresentaram falhas severas e ações imediatas "
-            "devem ser tomadas para preservar a integridade da missão."
+            "Estado crítico da missão foi atingido durante a operação. \n"
+            "Múltiplos sistemas mostraram comportamentos nocivos para \n"
+            "o estado da missão. É necessário ação e intervenção pelo bem\n"
+            "da integridade da missão."
         )
 
 
@@ -257,7 +271,7 @@ def analise_ciclo():
         if pontuacao_total >= 6:
             qtd_ciclos_criticos += 1
 
-        print(f"Pontuação de risco do ciclo: {pontuacao_total}")
+        print(f"\nPontuação de risco do ciclo: {pontuacao_total}")
         print(f"Classificação do ciclo: {classificacao}")
         print(f"Recomendação: {recomendacao}")
 
@@ -398,7 +412,11 @@ def gerar_relatorio(
 
     print(f"\nConclusão:")
     print(conclusao)
+    print("== == == == == == == == == == == == == == == == == == == == == == == == == == == == == ==")
 
+
+
+introducao_missao()
 
 dados = analise_ciclo()
 
