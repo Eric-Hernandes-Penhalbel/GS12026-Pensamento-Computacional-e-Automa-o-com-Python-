@@ -1,1 +1,0 @@
-# GS12026-Pensamento-Computacional-e-Automa-o-com-Python-
